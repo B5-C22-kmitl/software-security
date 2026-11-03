@@ -113,10 +113,15 @@ def register():
     password = request.form.get("password") or (request.json or {}).get("password")
     role = request.form.get("role") or (request.json or {}).get("role") or "user"
     con = db()
-    con.execute("INSERT INTO users (username, password, role) VALUES (?,?,?)",
-                (username, hashlib.md5(password.encode()).hexdigest(), role))
+    cur = con.execute(
+        "INSERT INTO users (username, password, role) "
+        "SELECT ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = ?)",
+        (username, hashlib.md5(password.encode()).hexdigest(), role, username))
     con.commit()
+    created = cur.rowcount == 1
     con.close()
+    if not created:
+        return "username already exists", 409
     return redirect("/")
 
 
