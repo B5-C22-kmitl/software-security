@@ -15,4 +15,4 @@ services:
     command: >
       bash -c "pip install --no-cache-dir flask &&
                echo '--- vulnerable app on :8080 (use solution_app.py for the fixed version) ---' &&
-               python vulnerable_app.py"
+               python student_patch.py"
